@@ -1,21 +1,96 @@
-// DmudClient.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
-#include "pch.h"
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <iostream>
+
+#pragma comment(lib, "Ws2_32.lib")
+
+constexpr int bufflen = 2048;
+
 
 int main()
 {
-    std::cout << "Hello World!\n"; 
+	WSAData wsaData;
+
+	int recvbufflen = bufflen;
+
+	int iResult;
+	char *sendbuf = nullptr;
+	char recvbuf[bufflen];
+
+
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		std::cout << "WSAStartup failed: " << iResult << std::endl;
+		return 1;
+	}
+
+	struct addrinfo *result = NULL,
+		*ptr = NULL,
+		hints;
+
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	iResult = getaddrinfo("23.111.136.202", "4000", &hints, &result);
+	if (iResult != 0) {
+		printf("getaddrinfo failed: %d\n", iResult);
+		WSACleanup();
+		return 1;
+	}
+	else
+	{
+		std::cout << "Connection Successful!" << std::endl;
+	}
+
+	SOCKET ConnectSocket = INVALID_SOCKET;
+
+	ptr = result;
+
+	// Create a SOCKET for connecting to server
+	ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
+		ptr->ai_protocol);
+
+	if (ConnectSocket == INVALID_SOCKET) {
+		std::cout << "Error at socket(): " << WSAGetLastError() << std::endl;
+		freeaddrinfo(result);
+		WSACleanup();
+		return 1;
+	}
+
+	iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+	if (iResult == SOCKET_ERROR) {
+		closesocket(ConnectSocket);
+		ConnectSocket = INVALID_SOCKET;
+	}
+
+	freeaddrinfo(result);
+
+	if (ConnectSocket == INVALID_SOCKET) {
+		std::cout << "Unable to connect to server!" << std::endl;
+		WSACleanup();
+		return 1;
+	}
+
+	do {
+		iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
+		if (iResult > 0)
+		{
+			std::cout << recvbuf << std::endl;
+		}
+		else if (iResult == 0)
+		{
+			return 2;  
+		}
+		else
+			printf("recv failed: %d\n", WSAGetLastError());
+	} while (iResult > 0);
+
+	getchar();
+
+
+	return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

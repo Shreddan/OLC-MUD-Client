@@ -1,14 +1,55 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <Windows.h>
 #include <iostream>
+#include <sstream>
+#include <wchar.h>
+//#include <vector>
 
 #pragma comment(lib, "Ws2_32.lib")
 
-constexpr int bufflen = 2048;
+#define SE 240
+#define NOP 241
+#define DM 242
+#define BRK 243
+#define IP 244
+#define AO 245
+#define AYT 246
+#define EC 247
+#define EL 248
+#define GA 249
+#define SB 250
+#define WILL 251
+#define WONT 252
+#define DO 253
+#define DONT 254
+#define IAC 255
+
+
+
+constexpr int bufflen = 2056;
+
+void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, std::stringstream &ss, char *sendbuf[])
+{
+	while (iResult >= 0)
+	{
+		iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
+
+		if (iResult > 0)
+		{
+			ss << recvbuf;
+			std::cout << ss.str() << std::endl;
+		}
+	}
+
+	
+}
 
 
 int main()
 {
+	SetConsoleMode(GetConsoleWindow(), ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+
 	WSAData wsaData;
 
 	int recvbufflen = bufflen;
@@ -16,6 +57,10 @@ int main()
 	int iResult;
 	char *sendbuf = nullptr;
 	char recvbuf[bufflen];
+
+	std::stringstream ss;
+
+
 
 
 	// Initialize Winsock
@@ -43,6 +88,7 @@ int main()
 	else
 	{
 		std::cout << "Connection Successful!" << std::endl;
+		std::cout << std::endl;
 	}
 
 	SOCKET ConnectSocket = INVALID_SOCKET;
@@ -74,19 +120,15 @@ int main()
 		return 1;
 	}
 
-	do {
-		iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
-		if (iResult > 0)
-		{
-			std::cout << recvbuf << std::endl;
-		}
-		else if (iResult == 0)
-		{
-			return 2;  
-		}
-		else
-			printf("recv failed: %d\n", WSAGetLastError());
-	} while (iResult > 0);
+
+	sendbuf = new char[3];
+	sendbuf[0] = ' ';
+	sendbuf[1] = '²';
+	sendbuf[2] = 'V';
+
+	
+	Receive(recvbuf, iResult, ConnectSocket, recvbufflen, ss, &sendbuf);
+	
 
 	getchar();
 

@@ -27,7 +27,7 @@
 
 
 
-constexpr int bufflen = 2048;
+constexpr int bufflen = 2056;
 
 void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, char* sendbuf, std::vector<char> Neg)
 {
@@ -72,11 +72,10 @@ int main()
 	std::vector<char> Neg;
 
 
-
-
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0) {
+	if (iResult != 0) 
+	{
 		std::cout << "WSAStartup failed: " << iResult << std::endl;
 		return 1;
 	}
@@ -91,7 +90,8 @@ int main()
 	hints.ai_protocol = IPPROTO_TCP;
 
 	iResult = getaddrinfo("23.111.136.202", "4000", &hints, &result);
-	if (iResult != 0) {
+	if (iResult != 0) 
+	{
 		printf("getaddrinfo failed: %d\n", iResult);
 		WSACleanup();
 		return 1;

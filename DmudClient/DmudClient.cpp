@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <wchar.h>
-//#include <vector>
+#include <vector>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -27,18 +27,30 @@
 
 
 
-constexpr int bufflen = 2056;
+constexpr int bufflen = 2048;
 
-void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, std::stringstream &ss, char *sendbuf[])
+void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, char* sendbuf, std::vector<char> Neg)
 {
+	iResult = 0;
+	recvbuf = new char[bufflen];
 	while (iResult >= 0)
 	{
 		iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
 
-		if (iResult > 0)
+		if (iResult == 1863)
 		{
-			ss << recvbuf;
-			std::cout << ss.str() << std::endl;
+			for (int i = 0; i <= iResult; i++)
+			{
+				Neg.emplace_back(recvbuf[i]);
+			}
+			for (size_t j = 24; j < Neg.size() - 1; j++)
+			{
+				std::cout << Neg[j];
+			}
+
+			
+			send(ConnectSocket, sendbuf, 8, 0);
+			break;
 		}
 	}
 
@@ -48,17 +60,16 @@ void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen,
 
 int main()
 {
-	SetConsoleMode(GetConsoleWindow(), ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-
 	WSAData wsaData;
 
 	int recvbufflen = bufflen;
 
 	int iResult;
 	char *sendbuf = nullptr;
-	char recvbuf[bufflen];
+	char *recvbuf = nullptr;
 
 	std::stringstream ss;
+	std::vector<char> Neg;
 
 
 
@@ -116,21 +127,33 @@ int main()
 
 	if (ConnectSocket == INVALID_SOCKET) {
 		std::cout << "Unable to connect to server!" << std::endl;
+		getchar();
 		WSACleanup();
 		return 1;
 	}
 
+	sendbuf = new char[9];
 
-	sendbuf = new char[3];
-	sendbuf[0] = ' ';
-	sendbuf[1] = '²';
-	sendbuf[2] = 'V';
-
+	sendbuf[0] = 'D';
+	sendbuf[1] = 'a';
+	sendbuf[2] = 'n';
+	sendbuf[3] = 'i';
+	sendbuf[4] = 'c';
+	sendbuf[5] = 'r';
+	sendbuf[6] = 'o';
+	sendbuf[7] = 'n';
+	sendbuf[8] = '\n';
 	
-	Receive(recvbuf, iResult, ConnectSocket, recvbufflen, ss, &sendbuf);
+	Receive(recvbuf, iResult, ConnectSocket, recvbufflen, sendbuf, Neg);
+
 	
 
 	getchar();
+
+	sendbuf = nullptr;
+	recvbuf = nullptr;
+
+	Receive(recvbuf, iResult, ConnectSocket, recvbufflen, sendbuf, Neg);
 
 
 	return 0;

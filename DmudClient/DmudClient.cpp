@@ -26,115 +26,115 @@ void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 		{
 			nego.emplace_back(" IAC ");
 		}
-		if (Neg[i] == (char)WILL)
+		else if (Neg[i] == (char)WILL)
 		{
 			nego.emplace_back(" WILL ");
 		}
-		if (Neg[i] == (char)WONT)
+		else if (Neg[i] == (char)WONT)
 		{
 			nego.emplace_back(" WONT ");
 		}
-		if (Neg[i] == (char)DO)
+		else if (Neg[i] == (char)DO)
 		{
 			nego.emplace_back(" DO ");
 		}
-		if (Neg[i] == (char)DONT)
+		else if (Neg[i] == (char)DONT)
 		{
 			nego.emplace_back(" DONT ");
 		}
-		if (Neg[i] == (char)GA)
+		else if (Neg[i] == (char)GA)
 		{
 			nego.emplace_back(" GO AHEAD ");
 		}
-		if (Neg[i] == (char)EL)
+		else if (Neg[i] == (char)EL)
 		{
 			nego.emplace_back(" EL ");
 		}
-		if (Neg[i] == (char)EC)
+		else if (Neg[i] == (char)EC)
 		{
 			nego.emplace_back(" EC ");
 		}
-		if (Neg[i] == (char)AYT)
+		else if (Neg[i] == (char)AYT)
 		{
 			nego.emplace_back(" AYT ");
 		}
-		if (Neg[i] == (char)MCCP1)
+		else if (Neg[i] == (char)MCCP1)
 		{
 			nego.emplace_back(" MCCP1 ");
 		}
-		if (Neg[i] == (char)MCCP2)
+		else if (Neg[i] == (char)MCCP2)
 		{
 			nego.emplace_back(" MCCP2 ");
 		}
-		if (Neg[i] == (char)BEL)
+		else if (Neg[i] == (char)BEL)
 		{
 			Beep(300, 500);
 		}
-		if (Neg[i] == (char)ECHO)
+		else if (Neg[i] == (char)ECHO)
 		{
 			nego.emplace_back(" ECHO ");
 		}
-		if (Neg[i] == (char)IP)
+		else if (Neg[i] == (char)IP)
 		{
 			nego.emplace_back(" IP ");
 		}
-		if (Neg[i] == (char)BRK)
+		else if (Neg[i] == (char)BRK)
 		{
 			nego.emplace_back(" BREAK ");
 		}
-		if (Neg[i] == (char)DM)
+		else if (Neg[i] == (char)DM)
 		{
 			nego.emplace_back(" DM ");
 		}
-		if (Neg[i] == (char)NOP)
+		else if (Neg[i] == (char)NOP)
 		{
 			nego.emplace_back(" NOP ");
 		}
-		if (Neg[i] == (char)EOR)
+		else if (Neg[i] == (char)EOR)
 		{
 			nego.emplace_back(" EOR ");
 		}
-		if (Neg[i] == (char)GMCP)
+		else if (Neg[i] == (char)GMCP)
 		{
 			nego.emplace_back(" GMCP ");
 		}
-		if (Neg[i] == (char)MSDP)
+		else if (Neg[i] == (char)MSDP)
 		{
 			nego.emplace_back(" MSDP ");
 		}
-		if (Neg[i] == (char)MSSP)
+		else if (Neg[i] == (char)MSSP)
 		{
 			nego.emplace_back(" MSSP ");
 		}
-		if (Neg[i] == (char)MTTS)
+		else if (Neg[i] == (char)MTTS)
 		{
 			nego.emplace_back(" MTTS ");
 		}
-		if (Neg[i] == (char)NAWS)
+		else if (Neg[i] == (char)NAWS)
 		{
 			nego.emplace_back(" NAWS ");
 		}
-		if (Neg[i] == (char)SUPPRGA)
+		else if (Neg[i] == (char)SUPPRGA)
 		{
 			nego.emplace_back(" SUPPRESS GO-AHEAD ");
 		}
-		if (Neg[i] == (char)SB)
+		else if (Neg[i] == (char)SB)
 		{
 			nego.emplace_back(" SB ");
 		}
-		if (Neg[i] == (char)SE)
+		else if (Neg[i] == (char)SE)
 		{
 			nego.emplace_back(" SE ");
 		}
-		if (Neg[i] == (char)ABRT)
+		else if (Neg[i] == (char)ABRT)
 		{
 			nego.emplace_back(" ABORT ");
 		}
-		if (Neg[i] == (char)XEOF)
+		else if (Neg[i] == (char)XEOF)
 		{
 			nego.emplace_back(" XEOF ");
 		}
-		if (Neg[i] == (char)ATCP)
+		else if (Neg[i] == (char)ATCP)
 		{
 			nego.emplace_back(" ATCP ");
 		}
@@ -143,19 +143,21 @@ void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 
 void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, char* sendbuf, std::vector<char>& Neg, std::vector<std::string>& nego)
 {
-	iResult = 0;
-	recvbuf = new char[bufflen];
-	while (iResult >= 0)
+	int counter = 0;
+	iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
+	while (iResult > 0)
 	{
-		iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
 
-		if (iResult == 1863)
+		for (int i = 0; i < iResult; i++)
 		{
-			for (int i = 0; i < iResult; i++)
-			{
-				Neg.emplace_back(recvbuf[i]);
-			}
+			Neg.emplace_back(recvbuf[i]);
+		}
+		if (Neg.size() > 0)
+		{
 			ParseTelnet(Neg, nego);
+		}
+		if (counter < 1)
+		{
 			for (size_t j = 0; j < nego.size(); j++)
 			{
 				std::cout << nego[j] + " ";
@@ -167,18 +169,17 @@ void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbuffle
 			std::cout << nego.size() << std::endl;
 			std::cout << std::endl;
 			std::cout << std::endl;
-			for (size_t k = 0; k < Neg.size() - 1; k++)
+			for (size_t k = 24; k < Neg.size() - 1; k++)
 			{
-				std::cout << Neg[k]; 
+				std::cout << Neg[k];
 			}
-
-			
-			
+			counter++;
+		}
+		else
+		{
 			break;
 		}
-	}
-
-	
+	}	
 }
 
 void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char> Neg, int recvbufflen)
@@ -191,12 +192,10 @@ void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char
 		{
 			for (int i = 0; i <= iResult; i++)
 			{
-				Neg.emplace_back( recvbuf[i]);
-				std::cout << Neg[i] << std::endl;
+				Neg.emplace_back(recvbuf[i]);
+				std::cout << Neg[i];
 			}
-
-			
-			
+			getchar();
 		}
 	}
 }
@@ -213,7 +212,7 @@ int main()
 
 	int iResult;
 	char *sendbuf = nullptr;
-	char *recvbuf = nullptr;
+	char recvbuf[bufflen];
 
 	std::stringstream ss;
 	std::vector<char> Neg;
@@ -224,7 +223,7 @@ int main()
 
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0) 
+	if (iResult != 0)
 	{
 		std::cout << "WSAStartup failed: " << iResult << std::endl;
 		return 1;
@@ -240,7 +239,7 @@ int main()
 	hints.ai_protocol = IPPROTO_TCP;
 
 	iResult = getaddrinfo("23.111.136.202", "4000", &hints, &result);
-	if (iResult != 0) 
+	if (iResult != 0)
 	{
 		printf("getaddrinfo failed: %d\n", iResult);
 		WSACleanup();
@@ -282,18 +281,10 @@ int main()
 		return 1;
 	}
 
-	sendbuf = new char[9];
+	sendbuf = new char[bufflen];
 
-	sendbuf[0] = 'D';
-	sendbuf[1] = 'a';
-	sendbuf[2] = 'n';
-	sendbuf[3] = 'i';
-	sendbuf[4] = 'c';
-	sendbuf[5] = 'r';
-	sendbuf[6] = 'o';
-	sendbuf[7] = 'n';
-	sendbuf[8] = '\r';
-	sendbuf[9] = '\n';
+	sendbuf[0] = (char)IAC;
+	sendbuf[1] = (char)GA;
 
 	OnConnect(recvbuf, iResult, ConnectSocket, recvbufflen, sendbuf, Neg, nego);
 	Connected = true;
@@ -302,6 +293,7 @@ int main()
 	while (Connected)
 	{
 		Receive(iResult, recvbuf, ConnectSocket, Neg, recvbufflen);
+		getchar();
 	}
 
 	

@@ -12,9 +12,29 @@
 #define VT			11
 #define FF			12
 #define CR			13
+
+#define EXTASC		17
+
+#define MTTS		24
+#define NAWS		31
+
+#define ENV			36
+#define CHARSET		42
+
+
+#define MSDP		69
+#define MSSP		70
+#define MCCP1		85
 #define MCCP2		86
+
+#define MSP			90
+#define MXP			91
+#define ZMP			93
+
+#define ATCP		200
+#define GMCP		201
              
-#define	xEOF		236	
+#define	XEOF		236	
 #define	SUSP		237	
 #define	ABRT		238	
 #define EOR			239

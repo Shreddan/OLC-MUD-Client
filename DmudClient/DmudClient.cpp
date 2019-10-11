@@ -1,35 +1,24 @@
-#include <winsock2.h>
+﻿#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <Windows.h>
 #include <iostream>
 #include <sstream>
 #include <wchar.h>
 #include <vector>
+#include <stdio.h>
+
+#include "Telnet.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#define SE 240
-#define NOP 241
-#define DM 242
-#define BRK 243
-#define IP 244
-#define AO 245
-#define AYT 246
-#define EC 247
-#define EL 248
-#define GA 249
-#define SB 250
-#define WILL 251
-#define WONT 252
-#define DO 253
-#define DONT 254
-#define IAC 255
+
+ 
 
 
 
 constexpr int bufflen = 2056;
 
-void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, char* sendbuf, std::vector<char> Neg)
+void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, char* sendbuf, std::vector<char>& Neg, std::vector<std::string>& nego)
 {
 	iResult = 0;
 	recvbuf = new char[bufflen];
@@ -39,17 +28,76 @@ void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen,
 
 		if (iResult == 1863)
 		{
-			for (int i = 0; i <= iResult; i++)
+			for (int i = 0; i < iResult; i++)
 			{
 				Neg.emplace_back(recvbuf[i]);
+
+				if (Neg[i] == (char)IAC)
+				{
+					nego.emplace_back(" IAC ");
+				}
+				if (Neg[i] == (char)WILL)
+				{
+					nego.emplace_back(" WILL ");
+				}
+				if (Neg[i] == (char)WONT)
+				{
+					nego.emplace_back(" WONT ");
+				}
+				if (Neg[i] == (char)DO)
+				{
+					nego.emplace_back(" DO ");
+				}
+				if (Neg[i] == (char)DONT)
+				{
+					nego.emplace_back(" DONT ");
+				}
+				if (Neg[i] == (char)GA)
+				{
+					nego.emplace_back(" GO AHEAD ");
+				}
+				if (Neg[i] == (char)EL)
+				{
+					nego.emplace_back(" EL ");
+				}
+				if (Neg[i] == (char)EC)
+				{
+					nego.emplace_back(" EC ");
+				}
+				if (Neg[i] == (char)AYT)
+				{
+					nego.emplace_back(" AYT ");
+				}
+				if (Neg[i] == (char)MCCP2)
+				{
+					nego.emplace_back(" MCCP2 ");
+				}
+				if (Neg[i] == (char)BEL)
+				{
+					Beep(300, 500);
+				}
+				if (Neg[i] == (char)ECHO)
+				{
+					nego.emplace_back(" ECHO ");
+				}
 			}
-			for (size_t j = 24; j < Neg.size() - 1; j++)
+			for (size_t j = 0; j < nego.size(); j++)
 			{
-				std::cout << Neg[j];
+				std::cout << nego[j] << " ";
+				if (j == 8)
+				{
+					std::cout << std::endl;
+				}
+			}
+			std::cout << std::endl;
+			std::cout << std::endl;
+			for (size_t k = 24; k < Neg.size() - 1; k++)
+			{
+				std::cout << Neg[k];
 			}
 
 			
-			send(ConnectSocket, sendbuf, 8, 0);
+			
 			break;
 		}
 	}
@@ -57,9 +105,32 @@ void Receive(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen,
 	
 }
 
+void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char> Neg, int recvbufflen)
+{
+	if (iResult >= 0)
+	{
+		iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
+
+		if (iResult > 0)
+		{
+			for (int i = 0; i <= iResult; i++)
+			{
+				Neg.emplace_back( recvbuf[i]);
+				std::cout << Neg[i] << std::endl;
+			}
+
+			
+			
+		}
+	}
+}
+
 
 int main()
 {
+	SetConsoleCP(437);
+	SetConsoleOutputCP(437);
+
 	WSAData wsaData;
 
 	int recvbufflen = bufflen;
@@ -70,6 +141,9 @@ int main()
 
 	std::stringstream ss;
 	std::vector<char> Neg;
+	std::vector<std::string> nego;
+
+	bool Connected = false;
 
 
 	// Initialize Winsock
@@ -142,19 +216,19 @@ int main()
 	sendbuf[5] = 'r';
 	sendbuf[6] = 'o';
 	sendbuf[7] = 'n';
-	sendbuf[8] = '\n';
-	
-	Receive(recvbuf, iResult, ConnectSocket, recvbufflen, sendbuf, Neg);
+	sendbuf[8] = '\r';
+	sendbuf[9] = '\n';
+
+	OnConnect(recvbuf, iResult, ConnectSocket, recvbufflen, sendbuf, Neg, nego);
+	Connected = true;
+	send(ConnectSocket, sendbuf, 10, 0);
+
+	while (Connected)
+	{
+		Receive(iResult, recvbuf, ConnectSocket, Neg, recvbufflen);
+	}
 
 	
-
-	getchar();
-
-	sendbuf = nullptr;
-	recvbuf = nullptr;
-
-	Receive(recvbuf, iResult, ConnectSocket, recvbufflen, sendbuf, Neg);
-
 
 	return 0;
 }

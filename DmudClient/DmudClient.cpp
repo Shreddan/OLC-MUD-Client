@@ -18,6 +18,13 @@
 
 constexpr int bufflen = 2056;
 
+void Send(std::string& in, int iResult, SOCKET ConnectSocket)
+{
+	std::getline(std::cin, in);
+	in.append("\n");
+	iResult = send(ConnectSocket, in.c_str(), in.size(), 0);
+}
+
 void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 {
 	for (size_t i = 0; i < Neg.size(); i++)
@@ -220,11 +227,7 @@ void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char
 			{
 				ParseTelnet(Neg, nego);
 			}
-			/*if (nego.size() > 0)
-			{
-				std::string cmd = { (char)IAC, (char)DO, (char)ECHO };
-				send(ConnectSocket, cmd.c_str(), cmd.size(), 0);
-			}*/
+			
 		}
 	}
 }
@@ -248,7 +251,7 @@ int main()
 	std::vector<char> Neg;
 	std::vector<std::string> nego;
 
-	bool Connected = false;
+	//bool Connected = false;
 
 
 	// Initialize Winsock
@@ -324,20 +327,12 @@ int main()
 	//std::cout << "OnConnect Completed" << std::endl;
 	//std::cout << std::endl;
 	Neg.clear();
-	std::cin >> in;
-	in.append("\n");
-	iResult = send(ConnectSocket, in.c_str(), in.size(), 0);
-	std::cin >> in;
-	in.append("\n");
-	iResult = send(ConnectSocket, in.c_str(), in.size(), 0);
-
+	Send(in, iResult, ConnectSocket);
 
 	while (select(0, &readfs, 0, 0, 0))
 	{
 		Receive(iResult, recvbuf, ConnectSocket, Neg, recvbufflen, nego);
-		std::cin >> in;
-		in.append("\n");
-		send(ConnectSocket, in.c_str(), in.size(), 0);
+		Send(in, iResult, ConnectSocket);
 	}
 	getchar();
 

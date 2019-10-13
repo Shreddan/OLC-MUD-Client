@@ -26,6 +26,22 @@ void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 		{
 			nego.emplace_back(" IAC ");
 		}
+		else if (Neg[i] == (char)ENV)
+		{
+			nego.emplace_back(" ENV ");
+		}
+		else if (Neg[i] == (char)MSP)
+		{
+			nego.emplace_back(" MSP ");
+		}
+		/*else if (Neg[i] == (char)MXP)
+		{
+			nego.emplace_back(" MXP ");
+		}*/
+		/*else if (Neg[i] == (char)ZMP)
+		{
+			nego.emplace_back(" ZMP ");
+		}*/
 		else if (Neg[i] == (char)WILL)
 		{
 			nego.emplace_back(" WILL ");
@@ -88,7 +104,7 @@ void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 		}
 		else if (Neg[i] == (char)NOP)
 		{
-			nego.emplace_back(" NOP ");
+			nego.emplace_back(" NO-OPERATION ");
 		}
 		else if (Neg[i] == (char)EOR)
 		{
@@ -98,10 +114,10 @@ void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 		{
 			nego.emplace_back(" GMCP ");
 		}
-		else if (Neg[i] == (char)MSDP)
+		/*else if (Neg[i] == (char)MSDP)
 		{
 			nego.emplace_back(" MSDP ");
-		}
+		}*/
 		else if (Neg[i] == (char)MSSP)
 		{
 			nego.emplace_back(" MSSP ");
@@ -138,14 +154,26 @@ void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 		{
 			nego.emplace_back(" ATCP ");
 		}
+		else if (Neg[i] == (char)EXTASC)
+		{
+			nego.emplace_back(" EXTENDED ASCII ");
+		}
+		else if (Neg[i] == (char)STATUS)
+		{
+			nego.emplace_back(" STATUS ");
+		}
+		else if (Neg[i] == (char)TIMINGMARK)
+		{
+		nego.emplace_back(" TIMING-MARK ");
+		}
 	}
 }
 
-void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, char* sendbuf, std::vector<char>& Neg, std::vector<std::string>& nego)
+void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, std::vector<char>& Neg, std::vector<std::string>& nego)
 {
 	int counter = 0;
 	iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
-	while (iResult > 0)
+	if (iResult > 0)
 	{
 
 		for (int i = 0; i < iResult; i++)
@@ -156,8 +184,6 @@ void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbuffle
 		{
 			ParseTelnet(Neg, nego);
 		}
-		if (counter < 1)
-		{
 			for (size_t j = 0; j < nego.size(); j++)
 			{
 				std::cout << nego[j] + " ";
@@ -169,25 +195,20 @@ void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbuffle
 			std::cout << nego.size() << std::endl;
 			std::cout << std::endl;
 			std::cout << std::endl;
-			for (size_t k = 24; k < Neg.size() - 1; k++)
+			for (size_t k = 24; k < Neg.size(); k++)
 			{
 				std::cout << Neg[k];
 			}
-			counter++;
-		}
-		else
-		{
-			break;
-		}
 	}	
 }
 
-void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char> Neg, int recvbufflen)
+void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char>& Neg, int recvbufflen, std::vector<std::string>& nego)
 {
+	memset(recvbuf, 0, recvbufflen);
+	Neg.clear();
 	if (iResult >= 0)
 	{
 		iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
-
 		if (iResult > 0)
 		{
 			for (int i = 0; i <= iResult; i++)
@@ -195,7 +216,15 @@ void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char
 				Neg.emplace_back(recvbuf[i]);
 				std::cout << Neg[i];
 			}
-			getchar();
+			if (Neg.size() > 0)
+			{
+				ParseTelnet(Neg, nego);
+			}
+			/*if (nego.size() > 0)
+			{
+				std::string cmd = { (char)IAC, (char)DO, (char)ECHO };
+				send(ConnectSocket, cmd.c_str(), cmd.size(), 0);
+			}*/
 		}
 	}
 }
@@ -211,10 +240,11 @@ int main()
 	int recvbufflen = bufflen;
 
 	int iResult;
-	char *sendbuf = nullptr;
 	char recvbuf[bufflen];
-
-	std::stringstream ss;
+	std::string in;
+	SOCKET sockets[1];
+	fd_set readfs;
+	fd_set writefs;
 	std::vector<char> Neg;
 	std::vector<std::string> nego;
 
@@ -281,22 +311,35 @@ int main()
 		return 1;
 	}
 
-	sendbuf = new char[bufflen];
+	sockets[0] = ConnectSocket;
 
-	sendbuf[0] = (char)IAC;
-	sendbuf[1] = (char)GA;
+	FD_ZERO(&readfs);
+	FD_ZERO(&writefs);
 
-	OnConnect(recvbuf, iResult, ConnectSocket, recvbufflen, sendbuf, Neg, nego);
-	Connected = true;
-	send(ConnectSocket, sendbuf, 10, 0);
+	FD_SET(sockets[0], &writefs);
+	FD_SET(sockets[0], &readfs);
 
-	while (Connected)
+	OnConnect(recvbuf, iResult, ConnectSocket, recvbufflen, Neg, nego);
+	std::cout << std::endl;
+	//std::cout << "OnConnect Completed" << std::endl;
+	//std::cout << std::endl;
+	Neg.clear();
+	std::cin >> in;
+	in.append("\n");
+	iResult = send(ConnectSocket, in.c_str(), in.size(), 0);
+	std::cin >> in;
+	in.append("\n");
+	iResult = send(ConnectSocket, in.c_str(), in.size(), 0);
+
+
+	while (select(0, &readfs, 0, 0, 0))
 	{
-		Receive(iResult, recvbuf, ConnectSocket, Neg, recvbufflen);
-		getchar();
+		Receive(iResult, recvbuf, ConnectSocket, Neg, recvbufflen, nego);
+		std::cin >> in;
+		in.append("\n");
+		send(ConnectSocket, in.c_str(), in.size(), 0);
 	}
-
-	
+	getchar();
 
 	return 0;
 }

@@ -1,31 +1,25 @@
-﻿#include <winsock2.h>
-#include <ws2tcpip.h>
+﻿#include "Socket.h"
 #include <Windows.h>
-#include <iostream>
 #include <sstream>
 #include <wchar.h>
 #include <vector>
 #include <stdio.h>
-
 #include "Telnet.h"
-
-#pragma comment(lib, "Ws2_32.lib")
-
-
- 
 
 
 
 constexpr int bufflen = 2056;
 
+
+
 void Send(std::string& in, int iResult, SOCKET ConnectSocket)
 {
 	std::getline(std::cin, in);
-	in.append("\n");
+	in += "\n";
 	iResult = send(ConnectSocket, in.c_str(), in.size(), 0);
 }
 
-void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
+void ParseTelnet(std::string Neg, std::vector<std::string>& nego)
 {
 	for (size_t i = 0; i < Neg.size(); i++)
 	{
@@ -176,7 +170,7 @@ void ParseTelnet(std::vector<char>& Neg, std::vector<std::string>& nego)
 	}
 }
 
-void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, std::vector<char>& Neg, std::vector<std::string>& nego)
+void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, std::string& Neg, std::vector<std::string>& nego)
 {
 	int counter = 0;
 	iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
@@ -185,7 +179,7 @@ void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbuffle
 
 		for (int i = 0; i < iResult; i++)
 		{
-			Neg.emplace_back(recvbuf[i]);
+			Neg.push_back(recvbuf[i]);
 		}
 		if (Neg.size() > 0)
 		{
@@ -209,7 +203,7 @@ void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbuffle
 	}	
 }
 
-void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char>& Neg, int recvbufflen, std::vector<std::string>& nego)
+void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::string& Neg, int recvbufflen, std::vector<std::string>& nego)
 {
 	memset(recvbuf, 0, recvbufflen);
 	Neg.clear();
@@ -220,7 +214,7 @@ void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char
 		{
 			for (int i = 0; i <= iResult; i++)
 			{
-				Neg.emplace_back(recvbuf[i]);
+				Neg.push_back(recvbuf[i]);
 				std::cout << Neg[i];
 			}
 			if (Neg.size() > 0)
@@ -232,110 +226,60 @@ void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::vector<char
 	}
 }
 
+void Communicate(std::string &in, int iResult, SOCKET ConnectSocket, char recvbuf[], std::string &Neg, int &recvbufflen, std::vector<std::string> &nego, fd_set readfs, fd_set writefs)
+{
+	if (select(0, &readfs, 0, 0, 0))
+	{
+		Receive(iResult, recvbuf, ConnectSocket, Neg, recvbufflen, nego);
+	}
+	if (select(0, 0, &writefs, 0, 0))
+	{
+		Send(in, iResult, ConnectSocket);
+	}
+}
+
 
 int main()
 {
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
-
-	WSAData wsaData;
-
 	int recvbufflen = bufflen;
-
-	int iResult;
+	
 	char recvbuf[bufflen];
 	std::string in;
-	SOCKET sockets[1];
+	
 	fd_set readfs;
 	fd_set writefs;
-	std::vector<char> Neg;
+	std::string Neg;
 	std::vector<std::string> nego;
 
 	//bool Connected = false;
+	Socket sock1;
 
+	sock1.initialiseSocket(sock1.iResult, sock1.ConnectSocket);
+	bool Connected = true;
 
-	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0)
-	{
-		std::cout << "WSAStartup failed: " << iResult << std::endl;
-		return 1;
-	}
-
-	struct addrinfo *result = NULL,
-		*ptr = NULL,
-		hints;
-
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-
-	iResult = getaddrinfo("23.111.136.202", "4000", &hints, &result);
-	if (iResult != 0)
-	{
-		printf("getaddrinfo failed: %d\n", iResult);
-		WSACleanup();
-		return 1;
-	}
-	else
-	{
-		std::cout << "Connection Successful!" << std::endl;
-		std::cout << std::endl;
-	}
-
-	SOCKET ConnectSocket = INVALID_SOCKET;
-
-	ptr = result;
-
-	// Create a SOCKET for connecting to server
-	ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
-		ptr->ai_protocol);
-
-	if (ConnectSocket == INVALID_SOCKET) {
-		std::cout << "Error at socket(): " << WSAGetLastError() << std::endl;
-		freeaddrinfo(result);
-		WSACleanup();
-		return 1;
-	}
-
-	iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-	if (iResult == SOCKET_ERROR) {
-		closesocket(ConnectSocket);
-		ConnectSocket = INVALID_SOCKET;
-	}
-
-	freeaddrinfo(result);
-
-	if (ConnectSocket == INVALID_SOCKET) {
-		std::cout << "Unable to connect to server!" << std::endl;
-		getchar();
-		WSACleanup();
-		return 1;
-	}
-
-	sockets[0] = ConnectSocket;
+	sock1.sockets[0] = sock1.ConnectSocket;
 
 	FD_ZERO(&readfs);
 	FD_ZERO(&writefs);
 
-	FD_SET(sockets[0], &writefs);
-	FD_SET(sockets[0], &readfs);
+	FD_SET(sock1.sockets[0], &writefs);
+	FD_SET(sock1.sockets[0], &readfs);
 
-	OnConnect(recvbuf, iResult, ConnectSocket, recvbufflen, Neg, nego);
+	OnConnect(recvbuf, sock1.iResult, sock1.ConnectSocket, recvbufflen, Neg, nego);
 	std::cout << std::endl;
-	//std::cout << "OnConnect Completed" << std::endl;
-	//std::cout << std::endl;
-	Neg.clear();
-	Send(in, iResult, ConnectSocket);
-
-	while (select(0, &readfs, 0, 0, 0))
+	Send(in, sock1.iResult, sock1.ConnectSocket);
+	
+	while (Connected)
 	{
-		Receive(iResult, recvbuf, ConnectSocket, Neg, recvbufflen, nego);
-		Send(in, iResult, ConnectSocket);
+		Communicate(in, sock1.iResult, sock1.ConnectSocket, recvbuf, Neg, recvbufflen, nego, readfs, writefs);
+		if (sock1.ConnectSocket == INVALID_SOCKET)
+		{
+			Connected = false;
+		}
 	}
 	getchar();
-
 	return 0;
 }
 

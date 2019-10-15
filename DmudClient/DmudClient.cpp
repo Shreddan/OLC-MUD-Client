@@ -4,13 +4,17 @@
 #include <wchar.h>
 #include <vector>
 #include <stdio.h>
+#include <algorithm>
 #include "Telnet.h"
 
 
 
-constexpr int bufflen = 2056;
+constexpr int bufflen = 2048;
 
-
+void prettify(std::string& Neg)
+{
+	std::remove_if(Neg.begin(), Neg.end(), [](const char c) {return c == '[' || c == '{'; });
+}
 
 void Send(std::string& in, int iResult, SOCKET ConnectSocket)
 {
@@ -172,7 +176,6 @@ void ParseTelnet(std::string Neg, std::vector<std::string>& nego)
 
 void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbufflen, std::string& Neg, std::vector<std::string>& nego)
 {
-	int counter = 0;
 	iResult = recv(ConnectSocket, recvbuf, recvbufflen, 0);
 	if (iResult > 0)
 	{
@@ -193,7 +196,7 @@ void OnConnect(char recvbuf[], int iResult, SOCKET ConnectSocket, int recvbuffle
 					std::cout << std::endl;
 				}
 			}
-			std::cout << nego.size() << std::endl;
+			//std::cout << nego.size() << std::endl;
 			std::cout << std::endl;
 			std::cout << std::endl;
 			for (size_t k = 24; k < Neg.size(); k++)
@@ -215,11 +218,14 @@ void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::string& Neg
 			for (int i = 0; i <= iResult; i++)
 			{
 				Neg.push_back(recvbuf[i]);
-				std::cout << Neg[i];
 			}
 			if (Neg.size() > 0)
 			{
-				ParseTelnet(Neg, nego);
+				prettify(Neg);
+			}
+			for (int j = 0; j < Neg.size(); j++)
+			{
+				std::cout << Neg[j];
 			}
 			
 		}

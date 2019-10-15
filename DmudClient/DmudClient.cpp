@@ -221,7 +221,7 @@ void Receive(int iResult, char recvbuf[], SOCKET ConnectSocket, std::string& Neg
 			}
 			if (Neg.size() > 0)
 			{
-				prettify(Neg);
+				//prettify(Neg);
 			}
 			for (int j = 0; j < Neg.size(); j++)
 			{
@@ -249,6 +249,7 @@ int main()
 {
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
+	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 	int recvbufflen = bufflen;
 	
 	char recvbuf[bufflen];

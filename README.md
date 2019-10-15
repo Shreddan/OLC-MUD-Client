@@ -1,8 +1,9 @@
 # DMud
 my own try at making a MUD client 
 
-##Goals
+## Goals
 
 |Task   |Status |   
 |-------|-------|
+|Support ANSI|Done|
 |Fix sending bug|Not Done|

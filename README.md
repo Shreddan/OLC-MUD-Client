@@ -7,3 +7,4 @@ my own try at making a MUD client
 |-------|-------|
 |Support ANSI|Done|
 |Fix sending bug|Not Done|
+|Add ability to log into different MUDs|Not Done|

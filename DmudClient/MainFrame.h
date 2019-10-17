@@ -1,6 +1,7 @@
 #pragma once
 
-#include <wx/wx.h>
+
+#include "Connection.h"
 
 enum cmd
 {
@@ -13,7 +14,13 @@ public:
 	MainFrame();
 	~MainFrame();
 
-	
+	void loop(std::vector<char>& recv);
+
+	wxTextCtrl *m_textCtrl1 = nullptr;
+
+	std::vector<char> recv;
+
+	wxFont font;
 	
 
 private:

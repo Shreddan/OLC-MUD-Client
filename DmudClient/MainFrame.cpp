@@ -2,17 +2,18 @@
 
 wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(wxID_EXIT, MainFrame::OnExit)
+	//EVT_MENU(1001, loop())
 wxEND_EVENT_TABLE()
 
 
-MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, "OLCMud-Client", wxDefaultPosition, wxSize(800, 600))
+MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, "OLCMud-Client", wxDefaultPosition, wxSize(1200, 800))
 {
 	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
 
 	wxMenuBar *m_menubar3 = new wxMenuBar(0);
 	wxMenu *m_menu2 = new wxMenu();
 	wxMenuItem* Connect;
-	Connect = new wxMenuItem(m_menu2, wxID_ANY, wxString(wxT("Connect")), wxEmptyString, wxITEM_NORMAL);
+	Connect = new wxMenuItem(m_menu2, 1001, wxString(wxT("Connect")), wxEmptyString, wxITEM_NORMAL);
 	m_menu2->Append(Connect);
 
 	m_menu2->Append(wxID_EXIT);
@@ -26,9 +27,15 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, "OLCMud-Client", wxDefaultPosit
 	fgSizer1->SetFlexibleDirection(wxBOTH);
 	fgSizer1->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	wxTextCtrl *m_textCtrl1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-	m_textCtrl1->SetMinSize(wxSize(600, 500));
-	m_textCtrl1->SetBackgroundColour("#000000");
+	m_textCtrl1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+	m_textCtrl1->SetMinSize(wxSize(800, 600));
+	//m_textCtrl1->SetBackgroundColour("#000000");
+	m_textCtrl1->SetDefaultStyle(wxTextAttr(*wxWHITE, *wxLIGHT_GREY));
+	//m_textCtrl1->SetDefaultStyle(
+
+	font = wxFont(11, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString, wxFONTENCODING_CP437);
+	m_textCtrl1->SetFont(font);
+
 
 	fgSizer1->Add(m_textCtrl1, 0, wxALL, 5);
 
@@ -57,9 +64,26 @@ MainFrame::~MainFrame()
 {
 }
 
+void MainFrame::loop(std::vector<char>& recv)
+{
+	Connection con1;
+	con1.initialise();
+	if (con1.sockConn->IsConnected())
+	{
+		*m_textCtrl1 << "Connection Established \n\n";
+	}
+	con1.read(con1.sockConn, con1.cb, recv, con1.aob);
+	if (con1.aob > 0)
+	{
+		*m_textCtrl1 << con1.aob;
+	}
+	for (size_t i = 0; i < recv.size(); i++)
+	{
+		*m_textCtrl1 << recv[i];
+	}
+}
+
 void MainFrame::OnExit(wxCommandEvent & event)
 {
 	Close(true);
 }
-
-

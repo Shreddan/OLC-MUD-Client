@@ -6,7 +6,7 @@ bool DmudClient::OnInit()
 {
 	MainFrame *frame = new MainFrame();
 	frame->Show(true);
-	std::cout << "Welcome to the Official OLC Mud Client!!!" << std::endl;
+	frame->loop(frame->recv);
 	return true;
 }
 

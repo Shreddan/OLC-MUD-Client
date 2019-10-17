@@ -11,7 +11,7 @@
 #define LF			10
 #define VT			11
 #define FF			12
-#define CR			13
+#define CARRET		13
 
 #define EXTASC		17
 

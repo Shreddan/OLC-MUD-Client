@@ -14,17 +14,21 @@ public:
 	MainFrame();
 	~MainFrame();
 
-	void loop(std::vector<char>& recv);
+	void loop(std::vector<wxString>& recv);
 
 	wxTextCtrl *m_textCtrl1 = nullptr;
+	wxTextCtrl *m_textCtrl3 = nullptr;
 
-	std::vector<char> recv;
+	std::vector<wxString> recv;
 
 	wxFont font;
 	
+	Connection con1;
 
 private:
 	void OnExit(wxCommandEvent& event);
+	void OnConnect(wxCommandEvent& event);
+	void OnSend(wxCommandEvent & event);
 
 	wxDECLARE_EVENT_TABLE();
 	

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include <wx/wx.h>
 #include <wx/socket.h>
 
@@ -13,12 +14,12 @@ public:
 
 	void initialise();
 
-	void read(wxSocketClient * sockConn, char cb[], std::vector<char>& recv, int& aob);
+	void read(wxSocketClient * sockConn, std::vector<wxString>& recv, int & aob, std::string rec);
 
 
 	wxSocketClient *sockConn;
 
-	char *cb;
+	std::string rec;
 
 	int aob;
 };

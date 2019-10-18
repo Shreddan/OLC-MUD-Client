@@ -21,19 +21,32 @@ void Connection::initialise()
 	if (!sockConn->Connect(addr, true)) {
 		std::cout << "Connect failed" << std::endl;
 	}
+	sockConn->SetNotify(wxSOCKET_INPUT_FLAG);
+	sockConn->Notify(true);
 	
 }
 
-void Connection::read(wxSocketClient *sockConn, char cb[], std::vector<char>& recv, int& aob)
+void Connection::read(wxSocketClient *sockConn, std::vector<wxString>& recv, int& aob, std::string rec)
 {
-	cb = new char[2048];
-	sockConn->Read(cb, 2048);
+	char cb[4096];
+	std::stringstream ss;
+	sockConn->Read(cb, 4096);
 	aob = sockConn->LastReadCount();
-	for (int i = 0; i < aob; i++)
+	for (int i = 24; i < aob; i++)
 	{
-		recv.emplace_back(cb[i]);
+		ss << cb[i];
 	}
-}            
+	while (std::getline(ss, rec, '\n'))
+	{
+		recv.push_back(rec);
+	}
+}
+
+
+
+
+
+
 
 
 

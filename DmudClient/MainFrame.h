@@ -14,12 +14,12 @@ public:
 	MainFrame();
 	~MainFrame();
 
-	void loop(std::vector<wxString>& recv);
+	void loop();
 
 	wxTextCtrl *m_textCtrl1 = nullptr;
 	wxTextCtrl *m_textCtrl3 = nullptr;
 
-	std::vector<wxString> recv;
+	//std::vector<char> recv;
 
 	wxFont font;
 	
@@ -29,6 +29,10 @@ private:
 	void OnExit(wxCommandEvent& event);
 	void OnConnect(wxCommandEvent& event);
 	void OnSend(wxCommandEvent & event);
+
+	void AnsiEsc(std::vector<char> &recv);
+
+	//void OnChar(wxKeyEvent & event);
 
 	wxDECLARE_EVENT_TABLE();
 	

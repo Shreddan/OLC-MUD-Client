@@ -14,12 +14,14 @@ public:
 
 	void initialise();
 
-	void read(wxSocketClient * sockConn, std::vector<wxString>& recv, int & aob, std::string rec);
+	void read(wxSocketClient * sockConn, char cb[], int &aob);
+
+	//void read(wxSocketClient *sockConn, std::vector<char>& recv, int & aob);
 
 
 	wxSocketClient *sockConn;
 
-	std::string rec;
+	char cb[4096];
 
 	int aob;
 };

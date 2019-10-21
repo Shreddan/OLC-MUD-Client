@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wx/richtext/richtextctrl.h>
 
 #include "Connection.h"
 
@@ -14,7 +15,12 @@ public:
 	MainFrame();
 	~MainFrame();
 
-	void loop();
+	void FilterSeq(std::vector<std::string>& recv, std::vector<std::string> &esc);
+
+	void loop(std::vector<std::string> &recv, std::vector<std::string> &Colours);
+
+	void AnsiEsc(std::vector<std::string>& esc);
+
 
 	wxTextCtrl *m_textCtrl1 = nullptr;
 	wxTextCtrl *m_textCtrl3 = nullptr;
@@ -24,13 +30,13 @@ public:
 	wxFont font;
 	
 	Connection con1;
+	std::vector<std::string> recv;
+	std::vector<std::string> esc;
 
 private:
 	void OnExit(wxCommandEvent& event);
 	void OnConnect(wxCommandEvent& event);
 	void OnSend(wxCommandEvent & event);
-
-	void AnsiEsc(std::vector<char> &recv);
 
 	//void OnChar(wxKeyEvent & event);
 

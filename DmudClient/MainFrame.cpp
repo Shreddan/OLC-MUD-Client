@@ -28,16 +28,16 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, "OLCMud-Client", wxDefaultPosit
 	fgSizer1->SetFlexibleDirection(wxBOTH);
 	fgSizer1->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	m_textCtrl1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+	m_textCtrl1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2);
 	m_textCtrl1->SetMinSize(wxSize(1100, 700));
 	m_textCtrl1->SetBackgroundColour("#000000");
 	m_textCtrl1->SetForegroundColour("#ffffff");
-
-
 	font = wxFont(11, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString);
 	m_textCtrl1->SetFont(font);
-	m_textCtrl1->SetDefaultStyle(wxTextAttr(wxFONTENCODING_UTF8));
+	m_textCtrl1->SetDefaultStyle(wxTextAttr("#ffffff"));
 	fgSizer1->Add(m_textCtrl1, 0, wxALL | wxEXPAND, 5);
+
+	
 
 
 	fgSizer1->Add(0, 0, 1, wxEXPAND, 5);
@@ -66,35 +66,98 @@ MainFrame::~MainFrame()
 	m_textCtrl3->Disconnect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(MainFrame::OnSend), NULL, this);
 }
 
-void MainFrame::loop()
+void MainFrame::FilterSeq(std::vector<std::string> &recv, std::vector<std::string> &esc)
 {
-	con1.initialise();
-	
-	con1.read(con1.sockConn, con1.cb, con1.aob);
-
-	for (int i = 0; i < con1.aob; i++)
+	for (size_t i = 0; i < recv.size(); i++)
 	{
-		*m_textCtrl1 << con1.cb[i];
-	}
-
-	while (con1.sockConn->IsConnected())
-	{
-
-		if (con1.sockConn->Wait())
+		for (int j = 0; j < recv[i].size(); j++)
 		{
-			con1.read(con1.sockConn, con1.cb, con1.aob);
-			for (int i = 0; i < con1.aob; i++)
+			if (recv[i][j] == '[')
 			{
-				*m_textCtrl1 << con1.cb[i];
+				esc.push_back(recv[i].substr(0, 6));
+				recv[i].erase(0, 6);
 			}
 		}
+		
 	}
 	
 }
 
-void MainFrame::AnsiEsc(std::vector<char> &recv)
+void MainFrame::loop(std::vector<std::string> &recv, std::vector<std::string> &esc)
 {
-	 
+	con1.initialise();
+	
+	con1.read(con1.sockConn, con1.cb, con1.aob, con1.textrecv, recv);
+	for (int i = 0; i < recv.size(); i++)
+	{
+		*m_textCtrl1 << recv[i];
+	}
+
+	
+	
+	while (con1.sockConn->IsConnected())
+	{
+		recv.clear();
+		if (con1.sockConn->Wait())
+		{
+			con1.read(con1.sockConn, con1.cb, con1.aob, con1.textrecv, recv);
+			FilterSeq(recv, esc);
+			AnsiEsc(esc);
+			//for (size_t a = 0; a < esc.size(); a++)
+			//{
+			//	*m_textCtrl1 << esc[a];
+			//}
+			for (int i = 0; i < recv.size(); i++)
+			{
+				if (esc.size() > 0)
+				{
+					m_textCtrl1->SetDefaultStyle(wxTextAttr(esc[i].c_str()));
+				}
+				*m_textCtrl1 << recv[i];
+			}
+		}
+		esc.clear();
+	}
+	
+}
+                                   
+
+
+void MainFrame::AnsiEsc(std::vector<std::string>& esc)
+{
+	for (size_t i = 0; i < esc.size(); i++)
+	{
+		if (esc[i] == "[0;31m" || esc[i] == "[1;31m")
+		{
+			esc[i] = "#ff0000";
+		}
+		else if (esc[i] == "[0;32m" || esc[i] == "[1;32m")
+		{
+			esc[i] = "#00ff00";
+		}
+		else if (esc[i] == "[0;33m" || esc[i] == "[1;33m")
+		{
+			esc[i] = "#ffff00";
+		}
+		else if (esc[i] == "[0;34m" || esc[i] == "[1:34m")
+		{
+			esc[i] = "#0000ff";
+		}
+		else if (esc[i] == "[0;35m" || esc[i] == "[1:35m")
+		{
+			esc[i] = "#ff00ff";
+		}
+		else if (esc[i] == "[0;36m" || esc[i] == "[1:36m")
+		{
+			esc[i] = "#00ffff";
+		}
+		else if (esc[i] == "[0;37m" || esc[i] == "[1;37m")
+		{
+			esc[i] = "#ffffff";
+		}
+		
+		
+	}
 }
 
 
@@ -107,7 +170,7 @@ void MainFrame::OnExit(wxCommandEvent & event)
 
 void MainFrame::OnConnect(wxCommandEvent & event)
 {
-	loop();
+	loop(recv, esc);
 }
 
 void MainFrame::OnSend(wxCommandEvent &event)
@@ -119,8 +182,6 @@ void MainFrame::OnSend(wxCommandEvent &event)
 		m_textCtrl1->AppendText(send);
 		m_textCtrl3->Clear();
 		con1.sockConn->Write(send.c_str(), send.size() + 1);
-		//int sent = con1.LastWriteCount();
-		//*m_textCtrl1 << sent;
 		event.Skip();
 	}
 }

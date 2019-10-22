@@ -16,9 +16,6 @@ public:
 
 	void read(wxSocketClient * sockConn, char cb[], int & aob, std::string & textrecv, std::vector<std::string>& temp);
 
-	//void read(wxSocketClient * sockConn, char cb[], int & aob, std::string& recv);
-
-	
 	std::string textrecv;
 
 	wxSocketClient *sockConn;

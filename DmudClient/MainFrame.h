@@ -15,12 +15,7 @@ public:
 	MainFrame();
 	~MainFrame();
 
-	void FilterSeq(std::vector<std::string>& recv, std::vector<std::string> &esc);
-
 	void loop(std::vector<std::string> &recv, std::vector<std::string> &Colours);
-
-	void AnsiEsc(std::vector<std::string>& esc);
-
 
 	wxTextCtrl *m_textCtrl1 = nullptr;
 	wxTextCtrl *m_textCtrl3 = nullptr;
@@ -38,7 +33,7 @@ private:
 	void OnConnect(wxCommandEvent& event);
 	void OnSend(wxCommandEvent & event);
 
-	//void OnChar(wxKeyEvent & event);
+	
 
 	wxDECLARE_EVENT_TABLE();
 	

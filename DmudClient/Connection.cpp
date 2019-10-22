@@ -21,7 +21,7 @@ void Connection::initialise()
 	if (!sockConn->Connect(addr, true)) {
 		std::cout << "Connect failed" << std::endl;
 	}
-	sockConn->SetNotify(wxSOCKET_INPUT_FLAG);
+	sockConn->SetNotify(wxSOCKET_INPUT_FLAG | wxSOCKET_OUTPUT_FLAG);
 
 }
 

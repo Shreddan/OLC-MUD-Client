@@ -31,6 +31,7 @@ MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, "OLCMud-Client", wxDefaultPosit
 	m_textCtrl1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2);
 	m_textCtrl1->SetMinSize(wxSize(1100, 700));
 	m_textCtrl1->SetBackgroundColour("#202020");
+	m_textCtrl1->SetForegroundColour("#ffffff");
 	font = wxFont(11, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString);
 	m_textCtrl1->SetFont(font);
 	m_textCtrl1->SetDefaultStyle(wxTextAttr("#ffffff"));
@@ -63,23 +64,6 @@ MainFrame::~MainFrame()
 	m_textCtrl3->Disconnect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(MainFrame::OnSend), NULL, this);
 }
 
-void MainFrame::FilterSeq(std::vector<std::string> &recv, std::vector<std::string> &esc)
-{
-	for (size_t i = 0; i < recv.size(); i++)
-	{
-		for (int j = 0; j < recv[i].size(); j++)
-		{
-			if (recv[i][j] == '[')
-			{
-				int end = recv[i].find_first_of('m');
-				esc.push_back(recv[i].substr(0, end));
-				recv[i].erase(0, 6);
-			}
-		}
-		
-	}
-	
-}
 
 void MainFrame::loop(std::vector<std::string> &recv, std::vector<std::string> &esc)
 {
@@ -118,59 +102,13 @@ void MainFrame::loop(std::vector<std::string> &recv, std::vector<std::string> &e
 	}
 	
 }
-                                   
-
-
-void MainFrame::AnsiEsc(std::vector<std::string>& esc)
-{
-	for (size_t i = 0; i < esc.size(); i++)
-	{
-		if (esc[i] == "[0m")
-		{
-			esc[i] = "#ffffff";
-		}
-		if (esc[i] == "[0;31" || esc[i] == "[1;31")
-		{
-			esc[i] = "#ff0000";
-		}
-		else if (esc[i] == "[0;32" || esc[i] == "[1;32")
-		{
-			esc[i] = "#00ff00";
-		}
-		else if (esc[i] == "[0;33" || esc[i] == "[1;33")
-		{
-			esc[i] = "#ffff00";
-		}
-		else if (esc[i] == "[0;34" || esc[i] == "[1;34")
-		{
-			esc[i] = "#0000ff";
-		}
-		else if (esc[i] == "[0;35" || esc[i] == "[1;35")
-		{
-			esc[i] = "#ff00ff";
-		}
-		else if (esc[i] == "[0;36" || esc[i] == "[1;36")
-		{
-			esc[i] = "#00ffff";
-		}
-		else if (esc[i] == "[0;37" || esc[i] == "[1;37")
-		{
-			esc[i] = "#ffffff";
-		}
-		else
-		{
-			*m_textCtrl1 << esc[i];
-		}
-		
-		
-	}
-}
-
-
 
 void MainFrame::OnExit(wxCommandEvent & event)
 {
-	con1.sockConn->Close();
+	if (con1.sockConn != nullptr)
+	{
+		con1.sockConn->Close();
+	}
 	Close(true);
 }
 

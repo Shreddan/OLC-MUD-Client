@@ -4,6 +4,7 @@
 #include <sstream>
 #include <wx/wx.h>
 #include <wx/socket.h>
+#include "Telnegotiations.h"
 
 class Connection : public wxSocketClient
 {
@@ -14,9 +15,13 @@ public:
 
 	void initialise();
 
-	void read(wxSocketClient * sockConn, char cb[], int & aob, std::string & textrecv, std::vector<std::string>& temp);
+	void read(wxSocketClient * sockConn, char cb[], int & aob, std::vector<char> &text);
 
-	std::string textrecv;
+
+	Telnegotiations tel1;
+
+	std::vector<std::string> ESC;
+	std::vector<char> text;
 
 	wxSocketClient *sockConn;
 

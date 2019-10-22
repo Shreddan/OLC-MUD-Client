@@ -1,9 +1,7 @@
 #pragma once
 #include <wx/app.h>
-#include <vector>
-#include <algorithm>
 
-#include "Telnet.h"
+#include <algorithm>
 #include "MainFrame.h"
 
 

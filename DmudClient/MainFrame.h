@@ -15,7 +15,7 @@ public:
 	MainFrame();
 	~MainFrame();
 
-	void loop(std::vector<std::string> &recv, std::vector<std::string> &Colours);
+	void loop();
 
 	wxTextCtrl *m_textCtrl1 = nullptr;
 	wxTextCtrl *m_textCtrl3 = nullptr;
@@ -25,8 +25,6 @@ public:
 	wxFont font;
 	
 	Connection con1;
-	std::vector<std::string> recv;
-	std::vector<std::string> esc;
 
 private:
 	void OnExit(wxCommandEvent& event);

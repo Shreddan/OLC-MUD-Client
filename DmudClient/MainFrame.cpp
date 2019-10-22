@@ -65,56 +65,30 @@ MainFrame::~MainFrame()
 }
 
 
-void MainFrame::loop(std::vector<std::string> &recv, std::vector<std::string> &esc)
+void MainFrame::loop()
 {
 	con1.initialise();
-	
-	con1.read(con1.sockConn, con1.cb, con1.aob, con1.textrecv, recv);
-	for (int i = 0; i < recv.size(); i++)
+	con1.read(con1.sockConn, con1.cb, con1.aob, con1.text);
+	for (size_t i = 0; i < con1.text.size(); i++)
 	{
-		*m_textCtrl1 << recv[i];
+		*m_textCtrl1 << con1.text[i];
 	}
+	
 
-	
-	
-	while (con1.sockConn->IsConnected())
-	{
-		recv.clear();
-		if (con1.sockConn->Wait())
-		{
-			con1.read(con1.sockConn, con1.cb, con1.aob, con1.textrecv, recv);
-			FilterSeq(recv, esc);
-			AnsiEsc(esc);
-			/*for (size_t a = 0; a < esc.size(); a++)
-			{
-				*m_textCtrl1 << esc[a];
-			}*/
-			for (int i = 0; i < recv.size(); i++)
-			{
-				if (esc.size() > 0)
-				{
-					m_textCtrl1->SetDefaultStyle(wxTextAttr(esc[i].c_str()));
-				}
-				*m_textCtrl1 << recv[i];
-			}
-		}
-		esc.clear();
-	}
-	
 }
 
 void MainFrame::OnExit(wxCommandEvent & event)
 {
 	if (con1.sockConn != nullptr)
 	{
-		con1.sockConn->Close();
+		con1.Close();
 	}
 	Close(true);
 }
 
 void MainFrame::OnConnect(wxCommandEvent & event)
 {
-	loop(recv, esc);
+	loop();
 }
 
 void MainFrame::OnSend(wxCommandEvent &event)

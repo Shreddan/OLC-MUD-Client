@@ -160,11 +160,13 @@
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="DmudClient.cpp" />
     <ClCompile Include="MainFrame.cpp" />
+    <ClCompile Include="Telnegotiations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Connection.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="DmudClient.h" />
+    <ClInclude Include="Telnegotiations.h" />
     <ClInclude Include="Telnet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

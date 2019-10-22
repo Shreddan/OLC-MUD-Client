@@ -25,18 +25,21 @@ void Connection::initialise()
 
 }
 
-void Connection::read(wxSocketClient *sockConn, char cb[], int& aob, std::string& textrecv, std::vector<std::string>& temp)
+void Connection::read(wxSocketClient *sockConn, char cb[], int& aob, std::vector<char> &text)
 {
-	std::stringstream ss;
+
 	sockConn->Read(cb, 4096);
 	aob = sockConn->LastReadCount();
 	for (int i = 0; i < aob; i++)
 	{
-		ss << cb[i];
-	}
-	while (std::getline(ss, textrecv, (char)0x001B))
-	{
-		temp.push_back(textrecv);
+		if (cb[i] > (char)128)
+		{
+			tel1.singulars.emplace_back(cb[i]);
+		}
+		else
+		{
+			 text.push_back(cb[i]);
+		}
 	}
 	
 	

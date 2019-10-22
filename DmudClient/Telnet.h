@@ -18,10 +18,6 @@
 #define MTTS		24
 #define NAWS		31
 
-#define ENV			36
-#define CHARSET		42
-
-
 #define MSDP		69
 #define MSSP		70
 #define MCCP1		85

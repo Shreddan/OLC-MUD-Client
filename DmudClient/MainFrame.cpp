@@ -68,11 +68,40 @@ MainFrame::~MainFrame()
 void MainFrame::loop()
 {
 	con1.initialise();
-	con1.read(con1.sockConn, con1.cb, con1.aob, con1.text);
-	for (size_t i = 0; i < con1.text.size(); i++)
+	con1.read(con1.sockConn, con1.aob, con1.out);
+	con1.Split(con1.out, con1.text);
+	if (con1.text.size() > 0)
 	{
-		*m_textCtrl1 << con1.text[i];
+		//m_textCtrl1->AppendText(std::to_string(con1.text.size()));
+		//m_textCtrl1->AppendText("\n");
+		for (size_t i = 0; i < con1.text.size(); i++)
+		{
+			
+			*m_textCtrl1 << con1.text[i];
+		}
 	}
+	
+	while (con1.sockConn->IsConnected())
+	{
+		con1.out.clear();
+		con1.text.clear();
+		if (con1.sockConn->WaitForRead())
+		{
+			con1.read(con1.sockConn, con1.aob, con1.out);
+			con1.Split(con1.out, con1.text);
+			if (con1.text.size() > 0)
+			{
+				for (size_t i = 0; i < con1.text.size(); i++)
+				{
+					*m_textCtrl1 << con1.text[i];
+				}
+			}
+		}
+	}
+
+
+
+
 	
 
 }

@@ -15,17 +15,18 @@ public:
 
 	void initialise();
 
-	void read(wxSocketClient * sockConn, char cb[], int & aob, std::vector<char> &text);
+	void read(wxSocketClient * sockConn, int & aob, std::string &out);
 
+	void Split(std::string out, std::vector<char> &text);
 
 	Telnegotiations tel1;
 
 	std::vector<std::string> ESC;
 	std::vector<char> text;
 
+	std::string out;
+	   
 	wxSocketClient *sockConn;
-
-	char cb[4096];
 
 	int aob;
 };

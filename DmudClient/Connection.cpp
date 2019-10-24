@@ -12,6 +12,7 @@ Connection::~Connection()
 {
 }
 
+//Socket Initialisation
 void Connection::initialise()
 {
 	sockConn = new wxSocketClient();
@@ -25,24 +26,33 @@ void Connection::initialise()
 
 }
 
-void Connection::read(wxSocketClient *sockConn, char cb[], int& aob, std::vector<char> &text)
+//Reading from the Socket
+void Connection::read(wxSocketClient *sockConn, int& aob, std::string &out)
 {
-
+	char cb[4096];
 	sockConn->Read(cb, 4096);
 	aob = sockConn->LastReadCount();
 	for (int i = 0; i < aob; i++)
 	{
-		if (cb[i] > (char)128)
+		out.push_back(cb[i]);
+	}
+}
+
+//Splitting printed text from Telnet Negotiations & ANSI Sequences
+void Connection::Split(std::string out, std::vector<char>& text)
+{
+	for (size_t i = 0; i < out.size(); i++)
+	{
+		if ((uint8_t)out[i] == IAC)
 		{
-			tel1.singulars.emplace_back(cb[i]);
+			i += 2;
+			continue;
 		}
 		else
 		{
-			 text.push_back(cb[i]);
+			text.push_back(out[i]);
 		}
 	}
-	
-	
 }
 
 

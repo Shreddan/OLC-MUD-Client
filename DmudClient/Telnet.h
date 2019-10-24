@@ -13,8 +13,6 @@
 #define FF			12
 #define CARRET		13
 
-#define EXTASC		17
-
 #define MTTS		24
 #define NAWS		31
 

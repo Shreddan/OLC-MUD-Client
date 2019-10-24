@@ -8,7 +8,7 @@ public:
 	Telnegotiations();
 	~Telnegotiations();
 
-	std::vector<char> singulars;
+	std::vector<std::string> singulars;
 	std::vector<std::tuple<int, int, int>> Negotiations;
 
 };

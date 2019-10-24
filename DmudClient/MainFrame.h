@@ -4,6 +4,7 @@
 
 #include "Connection.h"
 
+
 enum cmd
 {
 	ID_Connect = 1
@@ -20,7 +21,6 @@ public:
 	wxTextCtrl *m_textCtrl1 = nullptr;
 	wxTextCtrl *m_textCtrl3 = nullptr;
 
-	//std::vector<char> recv;
 
 	wxFont font;
 	

@@ -50,7 +50,15 @@ void Connection::Split(std::string out, std::vector<char>& text)
 		}
 		else
 		{
-			text.push_back(out[i]);
+			if (out[i] == 0x001B)
+			{
+				
+			}
+			else
+			{
+				text.push_back(out[i]);
+			}
+			
 		}
 	}
 }

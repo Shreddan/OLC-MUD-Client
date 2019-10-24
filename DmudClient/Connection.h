@@ -4,6 +4,7 @@
 #include <sstream>
 #include <wx/wx.h>
 #include <wx/socket.h>
+#include "Ansi.h"
 #include "Telnegotiations.h"
 
 class Connection : public wxSocketClient

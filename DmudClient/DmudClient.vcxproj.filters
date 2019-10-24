@@ -44,5 +44,8 @@
     <ClInclude Include="Telnegotiations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EscSeq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

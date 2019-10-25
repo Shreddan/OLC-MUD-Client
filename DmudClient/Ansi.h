@@ -14,6 +14,7 @@ public:
 	Ansi();
 	~Ansi();
 
+	uint32_t handleSeq();
 	
 
 	std::vector<Element> textElements;

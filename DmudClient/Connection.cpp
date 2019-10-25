@@ -50,9 +50,10 @@ void Connection::Split(std::string out, std::vector<char>& text)
 		}
 		else
 		{
-			if (out[i] == 0x001B)
+			if (out[i] == ESC)
 			{
-				
+				ansi1.Colours.push_back(out.substr(i, end));
+				i += end;
 			}
 			else
 			{

@@ -42,3 +42,5 @@
 #define BrightBGMagenta 105
 #define BrightBGCyan 106
 #define BrightBGWhite 107
+
+#define ESC 0x001B

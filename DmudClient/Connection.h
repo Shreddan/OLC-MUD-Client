@@ -21,8 +21,8 @@ public:
 	void Split(std::string out, std::vector<char> &text);
 
 	Telnegotiations tel1;
+	Ansi ansi1;
 
-	std::vector<std::string> ESC;
 	std::vector<char> text;
 
 	std::string out;

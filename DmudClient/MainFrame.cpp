@@ -98,12 +98,6 @@ void MainFrame::loop()
 			}
 		}
 	}
-
-
-
-
-	
-
 }
 
 void MainFrame::OnExit(wxCommandEvent & event)

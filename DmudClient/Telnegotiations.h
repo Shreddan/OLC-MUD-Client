@@ -9,7 +9,7 @@ public:
 	~Telnegotiations();
 
 	std::vector<std::string> singulars;
-	std::vector<std::tuple<int, int, int>> Negotiations;
+	std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> Negotiations;
 
 };
 

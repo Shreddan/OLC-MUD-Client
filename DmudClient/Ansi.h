@@ -1,12 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <sstream>
 
 #include "EscSeq.h"
 struct Element
 {
-	std::vector<uint8_t> Colours;
-	std::vector<char> text;
+	std::vector<std::string> Colours;
+	std::vector<std::string> text;
 };
 class Ansi
 {
@@ -14,9 +15,11 @@ public:
 	Ansi();
 	~Ansi();
 
-	uint32_t handleSeq();
-	
+	void handleSeq(std::vector<uint8_t>& Colours, std::vector<Element>& textElements, std::stringstream & s1);
 
+	std::vector<uint8_t> Colours;
+
+	std::stringstream s1;
+	
 	std::vector<Element> textElements;
 };
-

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <sstream>
 #include <wx/wx.h>
 #include <wx/socket.h>
 #include "Ansi.h"
@@ -18,12 +17,21 @@ public:
 
 	void read(wxSocketClient * sockConn, int & aob, std::string &out);
 
-	void Split(std::string out, std::vector<char> &text);
+	//void Split(std::string out);
+
+	void matchseq();
+
+	void Split(std::string out, std::vector<std::string>& text);
+
+	void Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour, int & endseq, std::stringstream &s1);
 
 	Telnegotiations tel1;
 	Ansi ansi1;
 
-	std::vector<char> text;
+	int endseq;
+
+	std::vector<std::string> text1;
+	std::string temp;
 
 	std::string out;
 	   

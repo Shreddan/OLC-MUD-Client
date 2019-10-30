@@ -11,13 +11,11 @@ Ansi::~Ansi()
 {
 }
 
-void Ansi::handleSeq(std::vector<uint8_t> &Colours, std::vector<Element> &textElements, std::stringstream &s1)
+void Ansi::handleSeq(std::vector<uint8_t> &Colours, std::vector<Element> &textElements, std::vector<std::string> &str)
 {
-	std::string tempte;
 	Element e;
 	for (size_t i = 0; i < Colours.size(); i++)
 	{
-		std::getline(s1, tempte);
 		switch (Colours[i])
 		{
 			case FGRed:
@@ -61,7 +59,7 @@ void Ansi::handleSeq(std::vector<uint8_t> &Colours, std::vector<Element> &textEl
 				break;
 			}
 		}
-		e.text.emplace_back(tempte);
+		e.text.emplace_back(str[i]);
 		textElements.emplace_back(e);
 	}
 }

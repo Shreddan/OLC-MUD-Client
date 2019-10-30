@@ -15,11 +15,11 @@ public:
 	Ansi();
 	~Ansi();
 
-	void handleSeq(std::vector<uint8_t>& Colours, std::vector<Element>& textElements, std::stringstream & s1);
+	void handleSeq(std::vector<uint8_t>& Colours, std::vector<Element>& textElements, std::vector<std::string> &str);
 
 	std::vector<uint8_t> Colours;
 
-	std::stringstream s1;
+	std::vector<std::string> str;
 	
 	std::vector<Element> textElements;
 };

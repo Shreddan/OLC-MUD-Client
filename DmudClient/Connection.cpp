@@ -37,13 +37,8 @@ void Connection::read(wxSocketClient *sockConn, int& aob, std::string &out) {
 	}
 }
 
-void Connection::matchseq()
-{
-
-}
-
 //Splitting printed text from Telnet Negotiations & ANSI Sequences
-void Connection::Split(std::string out, std::vector<std::string>& text)
+void Connection::Split(std::string& out, std::vector<std::string>& text)
 {
 	std::stringstream ss;
 	for (size_t i = 0; i < out.size(); i++)
@@ -65,29 +60,19 @@ void Connection::Split(std::string out, std::vector<std::string>& text)
 	}
 }
 
-void Connection::Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour, int &endseq, std::stringstream &s1)
+void Connection::Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour, int &endseq)
 {
 	colour.clear();
+	std::regex re("\\[(\\d);(\\d\\d)m(.*)");
+	std::smatch sm;
 	for (size_t i = 0; i < text1.size(); i++)
 	{
-		endseq = text1[i].find_first_of("m");
-		for (size_t j = 0; j < text1[i].size(); j++)
+		std::regex_search(text1[i], sm, re);
+		if (!sm.empty())
 		{
-			if (text1[i][j] == '[')
-			{
-				if (endseq > 1 && endseq < 6)
-				{
-					std::string col = text1[i].substr(endseq - 2, endseq - 1);
-					colour.emplace_back(std::stoi(col));
-					j += endseq;
-					ansi1.s1 << text1[i][j];
-				}
-				
-			}
+			ansi1.Colours.emplace_back((uint8_t)std::stoi(sm[2]));
+			ansi1.str.emplace_back(sm[3]);
 		}
 	}
 }
-
-
-
 

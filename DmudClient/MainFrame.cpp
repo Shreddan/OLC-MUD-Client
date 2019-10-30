@@ -88,17 +88,19 @@ void MainFrame::loop()
 		{
 			con1.read(con1.sockConn, con1.aob, con1.out);
 			con1.Split(con1.out, con1.text1);
-			con1.Vectorise(con1.text1, con1.ansi1.Colours, con1.endseq, con1.ansi1.s1);
-			con1.ansi1.handleSeq(con1.ansi1.Colours, con1.ansi1.textElements, con1.ansi1.s1);
+			con1.Vectorise(con1.text1, con1.ansi1.Colours, con1.endseq);
+			con1.ansi1.handleSeq(con1.ansi1.Colours, con1.ansi1.textElements, con1.ansi1.str);
 			if (con1.ansi1.textElements.size() > 0)
 			{
-				m_textCtrl1->AppendText(std::to_string(con1.ansi1.textElements.size()));
-				m_textCtrl1->AppendText("\n");
-				m_textCtrl1->AppendText("\n");
+				//m_textCtrl1->AppendText(std::to_string(con1.ansi1.textElements.size()));
 				for (size_t i = 0; i < con1.ansi1.textElements.size(); i++)
 				{
-					m_textCtrl1->SetDefaultStyle(wxTextAttr(con1.ansi1.textElements[i].Colours[i].c_str()));
-					*m_textCtrl1 << con1.ansi1.textElements[i].text[i];
+					for (size_t j = 0; j < con1.ansi1.textElements[i].text.size(); j++)
+					{
+						m_textCtrl1->SetDefaultStyle(wxTextAttr(con1.ansi1.textElements[i].Colours[j].c_str()));
+						*m_textCtrl1 << con1.ansi1.textElements[i].text[j];
+					}
+					//m_textCtrl1->AppendText("\n");
 				}
 			}
 		}

@@ -20,7 +20,7 @@ public:
 
 	void Split(std::string &out, std::vector<std::string>& text);
 
-	void Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour, int & endseq);
+	void Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour);
 
 	Telnegotiations tel1;
 	Ansi ansi1;

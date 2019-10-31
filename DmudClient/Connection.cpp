@@ -60,10 +60,10 @@ void Connection::Split(std::string& out, std::vector<std::string>& text)
 	}
 }
 
-void Connection::Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour, int &endseq)
+void Connection::Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour)
 {
 	colour.clear();
-	std::regex re("\\[(\\d);(\\d\\d)m(.*)");
+	std::regex re(R"(\[(\d);(\d\d)m(.+$))");
 	std::smatch sm;
 	for (size_t i = 0; i < text1.size(); i++)
 	{

@@ -14,7 +14,7 @@ Ansi::~Ansi()
 void Ansi::handleSeq(std::vector<uint8_t> &Colours, std::vector<Element> &textElements, std::vector<std::string> &str)
 {
 	Element e;
-	for (size_t i = 0; i < Colours.size(); i++)
+	for (size_t i = 0; i < str.size(); i++)
 	{
 		switch (Colours[i])
 		{

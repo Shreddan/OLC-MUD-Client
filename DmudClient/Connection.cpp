@@ -70,10 +70,6 @@ int Connection::ParseSeq(std::string &par)
 		std::string Colour = par.substr(longseq + 1, longseq + 2);
 		col = std::stoi(Colour);
 	}
-	else
-	{
-		col = 37;
-	}
 	return col;
 }
 
@@ -84,9 +80,13 @@ void Connection::Vectorise(std::vector<std::string>& text1, std::vector<std::str
 		if (text1[i][0] == '[')
 		{
 			int endseq = text1[i].find_first_of('m');
-			std::string par = text1[i].substr(0, endseq);
-			ansi1.Colours.emplace_back(ParseSeq(par));
-			ansi1.str.emplace_back(text1[i].substr(endseq + 1, text1[i].npos));
+			if (endseq > 2)
+			{
+				std::string par = text1[i].substr(0, endseq);
+				ansi1.Colours.emplace_back(ParseSeq(par));
+				ansi1.str.emplace_back(text1[i].substr(endseq + 1, text1[i].npos));
+			}
+			
 		}
 		else
 		{

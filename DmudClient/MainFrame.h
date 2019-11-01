@@ -16,6 +16,8 @@ public:
 	MainFrame();
 	~MainFrame();
 
+	wxFont style(int &Style);
+
 	void loop();
 
 	wxTextCtrl *m_textCtrl1 = nullptr;

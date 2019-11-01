@@ -65,6 +65,19 @@ MainFrame::~MainFrame()
 	m_textCtrl3->Disconnect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(MainFrame::OnSend), NULL, this);
 }
 
+wxFont MainFrame::style(int &Style)
+{
+	if (Style == StyleNormal)
+	{
+		font = wxFont(11, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString);
+	}
+	else if (Style == StyleBold)
+	{
+		font = wxFont(11, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString);
+	}
+	return wxFont(font);
+}
+
 
 void MainFrame::loop()
 {

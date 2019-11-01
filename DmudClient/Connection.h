@@ -21,12 +21,10 @@ public:
 
 	void Vectorise(std::vector<std::string>& text1, std::vector<std::string> &Seq);
 
-	void ParseSeq(std::vector<std::string> &Seq);
+	int ParseSeq(std::string &par);
 
 	Telnegotiations tel1;
 	Ansi ansi1;
-
-	int endseq;
 
 	std::vector<std::string> text1;
 	std::vector<std::string> Seq;

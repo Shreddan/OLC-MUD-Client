@@ -61,6 +61,21 @@ void Connection::Split(std::string& out, std::vector<std::string>& text)
 		text.emplace_back(temp);
 	}
 }
+int Connection::ParseSeq(std::string &par)
+{
+	int col = 37;
+	if (par.find(';'))
+	{
+		int longseq = par.find(';');
+		std::string Colour = par.substr(longseq + 1, longseq + 2);
+		col = std::stoi(Colour);
+	}
+	else
+	{
+		col = 37;
+	}
+	return col;
+}
 
 void Connection::Vectorise(std::vector<std::string>& text1, std::vector<std::string> &Seq)
 {
@@ -69,8 +84,8 @@ void Connection::Vectorise(std::vector<std::string>& text1, std::vector<std::str
 		if (text1[i][0] == '[')
 		{
 			int endseq = text1[i].find_first_of('m');
-			Seq.emplace_back(text1[i].substr(0, endseq));
-			//ansi1.Colours.emplace_back(37);
+			std::string par = text1[i].substr(0, endseq);
+			ansi1.Colours.emplace_back(ParseSeq(par));
 			ansi1.str.emplace_back(text1[i].substr(endseq + 1, text1[i].npos));
 		}
 		else
@@ -78,21 +93,9 @@ void Connection::Vectorise(std::vector<std::string>& text1, std::vector<std::str
 			ansi1.Colours.emplace_back(37);
 			ansi1.str.emplace_back(text1[i]);
 		}
-	}
-}
-
-void Connection::ParseSeq(std::vector<std::string> &Seq)
-{
-	
-	for (size_t i = 0; i < Seq.size(); i++)
-	{
-		if (Seq[i].find(';'))
-		{
-			int longseq = Seq[i].find(';');
-			std::string Colour = Seq[i].substr(longseq + 1, longseq + 2);
-			ansi1.Colours.emplace_back(std::stoi(Colour));
-		}
 		
 	}
 }
+
+
 

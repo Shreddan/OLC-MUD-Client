@@ -91,7 +91,6 @@ void MainFrame::loop()
 			con1.read(con1.sockConn, con1.aob, con1.out);
 			con1.Split(con1.out, con1.text1);
 			con1.Vectorise(con1.text1, con1.Seq);
-			con1.ParseSeq(con1.Seq);
 			con1.ansi1.handleSeq(con1.ansi1.Colours, con1.ansi1.textElements, con1.ansi1.str);
 			if (con1.ansi1.textElements.size() > 0)
 			{

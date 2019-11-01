@@ -52,27 +52,47 @@ void Connection::Split(std::string& out, std::vector<std::string>& text)
 		else
 		{
 			ss << out[i];
+
 		}
 	}
+	
 	while (std::getline(ss, temp, (char)0x001B))
 	{
 		text.emplace_back(temp);
 	}
 }
 
-void Connection::Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour)
+void Connection::Vectorise(std::vector<std::string>& text1, std::vector<std::string> &Seq)
 {
-	colour.clear();
-	std::regex re(R"(\[(\d);(\d\d)m(.+$))");
-	std::smatch sm;
 	for (size_t i = 0; i < text1.size(); i++)
 	{
-		std::regex_search(text1[i], sm, re);
-		if (!sm.empty())
+		if (text1[i][0] == '[')
 		{
-			ansi1.Colours.emplace_back((uint8_t)std::stoi(sm[2]));
-			ansi1.str.emplace_back(sm[3]);
+			int endseq = text1[i].find_first_of('m');
+			Seq.emplace_back(text1[i].substr(0, endseq));
+			//ansi1.Colours.emplace_back(37);
+			ansi1.str.emplace_back(text1[i].substr(endseq + 1, text1[i].npos));
 		}
+		else
+		{
+			ansi1.Colours.emplace_back(37);
+			ansi1.str.emplace_back(text1[i]);
+		}
+	}
+}
+
+void Connection::ParseSeq(std::vector<std::string> &Seq)
+{
+	
+	for (size_t i = 0; i < Seq.size(); i++)
+	{
+		if (Seq[i].find(';'))
+		{
+			int longseq = Seq[i].find(';');
+			std::string Colour = Seq[i].substr(longseq + 1, longseq + 2);
+			ansi1.Colours.emplace_back(std::stoi(Colour));
+		}
+		
 	}
 }
 

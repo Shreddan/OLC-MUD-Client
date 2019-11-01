@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <regex>
 #include <wx/wx.h>
 #include <wx/socket.h>
 #include "Ansi.h"
@@ -20,7 +19,9 @@ public:
 
 	void Split(std::string &out, std::vector<std::string>& text);
 
-	void Vectorise(std::vector<std::string>& text1, std::vector<uint8_t>& colour);
+	void Vectorise(std::vector<std::string>& text1, std::vector<std::string> &Seq);
+
+	void ParseSeq(std::vector<std::string> &Seq);
 
 	Telnegotiations tel1;
 	Ansi ansi1;
@@ -28,6 +29,7 @@ public:
 	int endseq;
 
 	std::vector<std::string> text1;
+	std::vector<std::string> Seq;
 	std::string temp;
 
 	std::string out;

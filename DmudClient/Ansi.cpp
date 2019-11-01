@@ -59,7 +59,8 @@ void Ansi::handleSeq(std::vector<uint8_t> &Colours, std::vector<Element> &textEl
 				break;
 			}
 		}
-		e.text.emplace_back(str[i]);
-		textElements.emplace_back(e);
+			e.text.emplace_back(str[i]);
+			textElements.emplace_back(e);
 	}
+	
 }

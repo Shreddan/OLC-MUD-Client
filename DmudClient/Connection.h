@@ -34,6 +34,10 @@ public:
 	   
 	wxSocketClient *sockConn;
 
+	wxString address;
+
+	int port;
+
 	int aob;
 };
 
